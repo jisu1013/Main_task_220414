@@ -1,6 +1,6 @@
 from tokenizers import Tokenizer, models
 
-tokenizer = Tokenizer(models.BPE('./output/vocab.json', './output/merges.txt'))
+tokenizer = Tokenizer(models.BPE('./tokenizer_30522/vocab.json', './tokenizer_30522/merges.txt'))
 
 test_str1 = '이스라엘 인 하아레츠의 편집위원실은 트럼프가 “베냐민 네타냐후의 뺨을 후려쳤다”며 미국의 개입은 중동 지역의 게임 규칙을 정하는 데 “러시아에 맞서는 중요한 균형추 역할을 해왔다”고 강조했다.'
 test_str2 = '이 단지의 전용면적 별 매매 시세는 59 공급 25평형 13억2000만 15억원 84 공급 34평형 16억5000만 18억5000만원 115 공급 44평형 23억 24억원 135 공급 52평형 25억 28억원 168 공급 62평형 28억5000만원 31억원 198 공급 72평형 30억 32억원 222 공급 81평형 31억 36억원 선에 형성돼 있다.'

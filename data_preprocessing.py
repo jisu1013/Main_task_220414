@@ -1,5 +1,6 @@
 import re
 from multiprocessing import Pool
+import random
 
 
 def preprocessing(x):
@@ -57,16 +58,43 @@ def preprocessing(x):
                 print('check')
 
                 if len(text) > 5:
-                    w = open('./preprocess_txt/preprocess_3.txt', 'a')
+                    w = open('./preprocess_txt/preprocess1.txt', 'a')
                     w.write(text + '\n')
                     w.close()
     except:
         print('fail')
 
 
+def train_val_test_split():
+    f = open('./preprocess_txt/preprocess.txt', 'r')
+    lines = f.readlines()
+    print(len(lines))
+    val_lines = []
+    test_lines = []
+    val_ratio = 1000
+    test_ratio = 2000 #int(len(lines) * 0.05)
+    for i in range(val_ratio):
+        while True:
+            r = random.randint(0, len(lines)-1)
+            if r not in val_lines:
+                f1 = open('./preprocess_txt/val_data.txt', 'a')
+                f1.write(lines[r] + '\n')
+                val_lines.append(r)
+                f1.close()
+                break
+    for j in range(test_ratio):
+        while True:
+            r = random.randint(0, len(lines)-1)
+            if (r not in val_lines) and (r not in test_lines):
+                f2 = open('./preprocess_txt/test_data.txt', 'a')
+                f2.write(lines[r] + '\n')
+                test_lines.append(r)
+                f2.close()
+                break
+
+
 if __name__ == "__main__":
-    num_cores = 8
-    #for i in range(0, 556):
-    #    preprocessing(i)
-    pool = Pool(num_cores)
-    pool.map(preprocessing, range(0, 556))
+    #num_cores = 8
+    #pool = Pool(num_cores)
+    #pool.map(preprocessing, range(0, 556))
+    train_val_test_split()
