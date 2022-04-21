@@ -1,11 +1,12 @@
 import re
 from multiprocessing import Pool
 import random
+from tqdm import tqdm
 
 
 def preprocessing(x):
     try:
-        with open('./text_data/texts' + str(x) + '.txt', 'r', encoding='utf-8') as f:
+        with open('./text_data/texts' + str(x) + '.txt', 'r') as f: #인코딩 문제 있음
             lines = f.readlines()
             for line in lines:
                 text = line.strip()
@@ -15,7 +16,7 @@ def preprocessing(x):
                 text = text.replace('日', '일본')
                 text = text.replace('北', '북한')
 
-                pattern = '[^가-힣A-Za-z0-9.,()\'\e"\”\‘\“\’·@_/%\s]'  # ( ) ',",@,.,-,\s,_ 제외 제거(special token)
+                pattern = '[^가-힣A-Za-z0-9.,()\'\"\”\‘\“\’·@_/%\s]'  # ( ) ',",@,.,-,\s,_ 제외 제거(special token)
                 text = re.sub(pattern=pattern, repl=' ', string=text)
 
                 pattern = '([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+)'  # e-mail주소 제거
@@ -55,10 +56,10 @@ def preprocessing(x):
                 text = re.sub(pattern=pattern, repl=' ', string=text)
 
                 text = text.lower()
-                print('check')
+                #print('check')
 
                 if len(text) > 5:
-                    w = open('./preprocess_txt/preprocess1.txt', 'a')
+                    w = open('./preprocess_txt/preprocess2.txt', 'a')
                     w.write(text + '\n')
                     w.close()
     except:
@@ -66,35 +67,50 @@ def preprocessing(x):
 
 
 def train_val_test_split():
-    f = open('./preprocess_txt/preprocess.txt', 'r')
+    f = open('./preprocess_txt/preprocess1.txt', 'r')
     lines = f.readlines()
-    print(len(lines))
     val_lines = []
     test_lines = []
-    val_ratio = 1000
-    test_ratio = 2000 #int(len(lines) * 0.05)
+    val_ratio = 20000
+    test_ratio = 40000
+
     for i in range(val_ratio):
         while True:
             r = random.randint(0, len(lines)-1)
             if r not in val_lines:
                 f1 = open('./preprocess_txt/val_data.txt', 'a')
-                f1.write(lines[r] + '\n')
+                f1.write(lines[r])
                 val_lines.append(r)
                 f1.close()
                 break
+    print('finish val')
+
     for j in range(test_ratio):
         while True:
             r = random.randint(0, len(lines)-1)
             if (r not in val_lines) and (r not in test_lines):
                 f2 = open('./preprocess_txt/test_data.txt', 'a')
-                f2.write(lines[r] + '\n')
+                f2.write(lines[r])
                 test_lines.append(r)
                 f2.close()
                 break
+    print('finish test')
+
+    train_ratio = len(lines) - test_ratio - val_ratio
+    for k in range(len(lines)):
+        if (k not in val_lines) and (k not in test_lines):
+            f3 = open('./preprocess_txt/train_data.txt', 'a')
+            f3.write(lines[k])
+            f3.close()
+            break
+    print('finish train')
 
 
 if __name__ == "__main__":
-    #num_cores = 8
-    #pool = Pool(num_cores)
-    #pool.map(preprocessing, range(0, 556))
-    train_val_test_split()
+    num_cores = 8
+    pool = Pool(num_cores)
+    pool.map(preprocessing, range(0, 557))
+    #for i in range(557):
+    #    preprocessing(i)
+    #    print(i)
+    #train_val_test_split()
