@@ -17,6 +17,7 @@ from transformers import (
 )
 from padding_packing import padding_txt
 from torch.nn.utils.rnn import pack_padded_sequence
+from pytorch_lightning.loggers import WandbLogger
 
 
 AVAIL_GPUS = min(1, torch.cuda.device_count())
@@ -194,7 +195,7 @@ if __name__ == '__main__':
     SEED = 42
     seed_everything(SEED)
 
-    vocab_size = 50000
+    vocab_size = 32000
     max_seq_len = 256
     batch_size = 16 #paper:8000
 
@@ -214,11 +215,12 @@ if __name__ == '__main__':
                                     max_seq_len=max_seq_len, vocab_size=vocab_size)
     data_module.setup('fit')
     model = RoBERTaTransformer(config=roberta_config)
-    logger = TensorBoardLogger("tb_logs", name="my_model", default_hp_metric=False)
+    logger = WandbLogger(project='roberta_small', name='roberta_small')
+    #logger = TensorBoardLogger("tb_logs", name="my_model", default_hp_metric=False)
     print('GPU: ', AVAIL_GPUS)
 
     trainer = Trainer(
-        max_epochs=10,
+        max_epochs=20,
         gpus=AVAIL_GPUS,
         logger=logger,
         log_every_n_steps=1,
